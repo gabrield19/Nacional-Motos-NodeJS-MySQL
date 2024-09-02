@@ -58,6 +58,7 @@ buy_btn.addEventListener("click", handle_buybtn);
 let itemsadded = [];
 
 function handle_carritoaddItem() {
+
     let product = this.parentElement;
     let title = product.querySelector(".producto-title").innerHTML;
     let price = product.querySelector(".producto-price").innerHTML;
@@ -78,6 +79,7 @@ function handle_carritoaddItem() {
     }
     else {
         itemsadded.push(newtoadd);
+
     }
 
     let carritoBoxElement = carritoboxComponent(title, price, imgSrc);
@@ -89,15 +91,20 @@ function handle_carritoaddItem() {
 };
 
 function handle_removecarritoItem() {
-    this.parentElement.remove();
+    const itemElement = this.parentElement;
+    // By using the trim() method, we ensured that both the item title from the DOM and the titles in the itemsadded array had no extra spaces, making the comparison accurate.
+    const itemTitle = itemElement.querySelector(".carrito-producto-title").innerHTML.trim();
 
-    itemsadded = itemsadded.filter(
-        (el) =>
-            el.title !== this.parentElement.querySelector(".carrito-producto-title").innerHTML
-    );
+    // Remove the item from the DOM
+    itemElement.remove();
 
+    // Update the itemsadded array
+    itemsadded = itemsadded.filter(el => el.title.trim() !== itemTitle);
+
+    // Update the cart
     update();
 }
+
 
 function handle_changeItemQuantity() {
     if (isNaN(this.value) || this.value < 1) {
@@ -123,29 +130,27 @@ function handle_buybtn() {
 
 function updateTotal() {
     let carritoBoxes = document.querySelectorAll(".carrito-box");
-    const totalElement = carrito.querySelector(".total-price");
+    const totalElement = document.querySelector(".total-price");
     let total = 0;
 
     carritoBoxes.forEach((carritobox) => {
-        let priceelement = carritobox.querySelector(".carrito-price");
-        let price = parseFloat(priceelement.innerHTML.replace("$", ""));
+        let priceElement = carritobox.querySelector(".carrito-price");
+        let price = parseFloat(priceElement.innerHTML.replace(/[^0-9-]+/g, "")); // Remove non-numeric characters
         let quantity = carritobox.querySelector(".carrito-quantity").value;
 
         total += price * quantity;
     });
-
-    total = total.toFixed(2);
-
-    
+    console.log(total);
+    total = parseFloat(total).toFixed(2); // Ensure total is a number before formatting
+   
     const formatter = new Intl.NumberFormat('es-CO', {
         style: 'currency',
         currency: 'COP',
-        
     });
 
     totalElement.innerHTML = formatter.format(total);
-    
 }
+
 
 function carritoboxComponent(title, price, imgSrc) {
     
@@ -164,7 +169,7 @@ function carritoboxComponent(title, price, imgSrc) {
 
         </div>      
 
-<object data="/assets/images/trash-alt-regular-24.png" type="image/png" class="carrito-remove"></object>
+<object data="./assets/images/trash-alt-regular-24.png" type="image/png" class="carrito-remove"></object>
 
     </div>
 `
